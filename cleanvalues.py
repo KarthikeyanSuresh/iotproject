@@ -1,29 +1,55 @@
 import os
 import json
 
-
 obj = {
-    "criteria": {
-        "Comfort": {
-            "Luminosity": 43,
-            "Noise": 20,
-            "Temperature": 24
+	"criteria": {
+		"Comfort" : {
+		     "Luminosity" : {
+                "Room 1" : 1,
+                "Room 2" : 4,
+                "Room 3" : 9
+             },
+		     "Temperature" : {
+                "Room 1" : 1,
+                "Room 2" : 1,
+                "Room 3" : 1
+             },
+		     "Noise" : {
+                "Room 1" : 1,
+                "Room 2" : 1,
+                "Room 3" : 1
+             }
+		},
+		"Health": {
+			"CO2" : {
+                "Room 1" : 1,
+                "Room 2" : 1,
+                "Room 3" : 1
+             },
+		     "Humidity" : {
+                "Room 1" : 1,
+                "Room 2" : 1,
+                "Room 3" : 1
+             },
+		     "Air Pressure" : {
+                "Room 1" : 1,
+                "Room 2" : 1,
+                "Room 3" : 1
+             }
         },
-        "Health": {
-            "CO2": 1,
-            "Humidity": 45,
-            "Pressure": 1
-        },
-        "Usage": {
-            "Cost": 1,
-            "Furniture": 1
-        }
-    },
-    "options": [
-        "Room 1",
-        "Room 2",
-        "Room 3"
-    ]
+		"Usage":{
+			"Furniture" : {
+                "Room 1" : 1,
+                "Room 2" : 1,
+                "Room 3" : 1
+             },
+		     "Accessibility" : {
+                "Room 1" : 1,
+                "Room 2" : 1,
+                "Room 3" : 1
+             }
+		}
+	}
 }
 
 
