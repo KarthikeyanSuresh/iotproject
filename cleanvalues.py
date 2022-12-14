@@ -72,7 +72,7 @@ for keys in obj['criteria']:
          # Normalizing Luminance Data
         if key == "Luminosity":
             if obj["criteria"][keys][key][room] >= 73:
-                obj["criteria"][keys][key][room] = 0
+                obj["criteria"][keys][key][room] = 0.001
             else:
                 if obj["criteria"][keys][key][room] < 73 and obj["criteria"][keys][key][room] >= 43:
                     obj["criteria"][keys][key] = 1
@@ -80,7 +80,7 @@ for keys in obj['criteria']:
                     if obj["criteria"][keys][key][room] < 43 and obj["criteria"][keys][key][room] >= 23:
                         obj["criteria"][keys][key][room] = 0.5
                     else:
-                        obj["criteria"][keys][key][room] = 0
+                        obj["criteria"][keys][key][room] = 0.001
     
 
         # Normalizing Noise Data
@@ -97,13 +97,13 @@ for keys in obj['criteria']:
                         if obj["criteria"][keys][key][room] > 80 and obj["criteria"][keys][key][room] <= 85:
                             obj["criteria"][keys][key][room] = 0.2
                         else:
-                            obj["criteria"][keys][key][room] = 0
+                            obj["criteria"][keys][key][room] = 0.001
         
 
         # Normalizing Temperature Data
         if key == "Humidity":
             if obj["criteria"][keys][key][room] <= 10:
-                obj["criteria"][keys][key][room] = 0
+                obj["criteria"][keys][key][room] = 0.001
             else:
                 if obj["criteria"][keys][key][room] > 10 and obj["criteria"][keys][key][room] <= 20:
                     obj["criteria"][keys][key][room] = 0.2
@@ -123,13 +123,13 @@ for keys in obj['criteria']:
                                     if obj["criteria"][keys][key][room] > 60 and obj["criteria"][keys][key][room] <= 80:
                                         obj["criteria"][keys][key][room] = 0.2
                                     else:
-                                        obj["criteria"][keys][key][room] = 0
+                                        obj["criteria"][keys][key][room] = 0.001
                             
         
         # Normalizing Humidity Data
         if key == "Temperature":
             if obj["criteria"][keys][key][room] <= 15:
-                obj["criteria"][keys][key][room] = 0
+                obj["criteria"][keys][key][room] = 0.001
             else:
                 if obj["criteria"][keys][key][room] > 15 and obj["criteria"][keys][key][room] <= 18:
                     obj["criteria"][keys][key][room] = 0.4
@@ -146,13 +146,13 @@ for keys in obj['criteria']:
                                 if obj["criteria"][keys][key][room] > 28 and obj["criteria"][keys][key][room] <= 30:
                                     obj["criteria"][keys][key][room] = 0.1
                                 else:
-                                    obj["criteria"][keys][key][room] = 0
+                                    obj["criteria"][keys][key][room] = 0.001
 
 
         # Normalizing CO2 Data                        
         if key == "CO2":
             if obj["criteria"][keys][key][room] >= 10000:
-                obj["criteria"][keys][key][room] = 0
+                obj["criteria"][keys][key][room] = 0.001
             else:
                 if obj["criteria"][keys][key][room] < 10000 and obj["criteria"][keys][key][room] >= 4000:
                     obj["criteria"][keys][key][room] = 0.2
@@ -172,7 +172,7 @@ for keys in obj['criteria']:
         # Normalizing Air Pressure Data                        
         if key == "Air Pressure":
             if obj["criteria"][keys][key][room] <= 100000:
-                obj["criteria"][keys][key][room] = 0
+                obj["criteria"][keys][key][room] = 0.001
             else:
                 if obj["criteria"][keys][key][room] > 100000 and obj["criteria"][keys][key][room] <= 100300:
                     obj["criteria"][keys][key][room] = 0.3
@@ -189,12 +189,8 @@ for keys in obj['criteria']:
                                 if obj["criteria"][keys][key][room] > 101900 and obj["criteria"][keys][key][room] <= 103000:
                                     obj["criteria"][keys][key][room] = 0.5
                                 else:
-                                    obj["criteria"][keys][key][room] = 0
-
-
-
+                                    obj["criteria"][keys][key][room] = 0.001
 
         # print(obj["criteria"][keys][key])
-
 
 print(json.dumps(obj, sort_keys=True, indent=4))
