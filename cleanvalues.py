@@ -159,6 +159,30 @@ for keys in obj['criteria']:
                             else:
                                 obj["criteria"][keys][key][room] = 0
                         
+    # Normalizing Air Pressure Data                        
+    if key == "Air Pressure":
+        if obj["criteria"][keys][key][room] <= 100000:
+            obj["criteria"][keys][key][room] = 0
+        else:
+            if obj["criteria"][keys][key][room] > 100000 and obj["criteria"][keys][key][room] <= 100300:
+                obj["criteria"][keys][key][room] = 0.3
+            else: 
+                if obj["criteria"][keys][key][room] > 100300 and obj["criteria"][keys][key][room] <= 100800:
+                    obj["criteria"][keys][key][room] = 0.5
+                else:
+                    if obj["criteria"][keys][key][room] > 100700 and obj["criteria"][keys][key][room] <= 101300:
+                        obj["criteria"][keys][key][room] = 0.8
+                    else:
+                        if obj["criteria"][keys][key][room] > 101300 and obj["criteria"][keys][key][room] <= 101900:
+                            obj["criteria"][keys][key][room] = 1
+                        else:  
+                            if obj["criteria"][keys][key][room] > 101900 and obj["criteria"][keys][key][room] <= 103000:
+                                obj["criteria"][keys][key][room] = 0.5
+                            else:
+                                obj["criteria"][keys][key][room] = 0
+
+
+
 
         # print(obj["criteria"][keys][key])
 
