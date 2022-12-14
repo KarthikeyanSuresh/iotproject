@@ -10,43 +10,43 @@ obj = {
                 "Room 3" : 90
              },
 		     "Temperature" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
+                "Room 1" : 14,
+                "Room 2" : 24,
+                "Room 3" : 30
              },
 		     "Noise" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
+                "Room 1" : 55,
+                "Room 2" : 60,
+                "Room 3" : 80
              }
 		},
 		"Health": {
 			"CO2" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
+                "Room 1" : 400,
+                "Room 2" : 350,
+                "Room 3" : 1000
              },
 		     "Humidity" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
+                "Room 1" : 20,
+                "Room 2" : 30,
+                "Room 3" : 60
              },
 		     "Air Pressure" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
+                "Room 1" : 103000,
+                "Room 2" : 101325,
+                "Room 3" : 100000
              }
         },
 		"Usage":{
 			"Furniture" : {
                 "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
+                "Room 2" : 0.7,
+                "Room 3" : 0.6
              },
 		     "Accessibility" : {
-                "Room 1" : 1,
+                "Room 1" : 0.7,
                 "Room 2" : 1,
-                "Room 3" : 1
+                "Room 3" : 0.8
              }
 		}
 	}
@@ -139,26 +139,24 @@ for keys in obj['criteria']:
 
     # Normalizing CO2 Data                        
     if key == "CO2":
-        if obj["criteria"][keys][key][room] <= 15:
+        if obj["criteria"][keys][key][room] >= 10000:
             obj["criteria"][keys][key][room] = 0
         else:
-            if obj["criteria"][keys][key][room] > 15 and obj["criteria"][keys][key][room] <= 18:
-                obj["criteria"][keys][key][room] = 0.4
+            if obj["criteria"][keys][key][room] < 10000 and obj["criteria"][keys][key][room] >= 4000:
+                obj["criteria"][keys][key][room] = 0.2
             else: 
-                if obj["criteria"][keys][key][room] > 18 and obj["criteria"][keys][key][room] <= 22:
-                    obj["criteria"][keys][key][room] = 1
+                if obj["criteria"][keys][key][room] < 4000 and obj["criteria"][keys][key][room] >= 2000:
+                    obj["criteria"][keys][key][room] = 0.4
                 else:
-                    if obj["criteria"][keys][key][room] > 22 and obj["criteria"][keys][key][room] <= 25:
+                    if obj["criteria"][keys][key][room] < 2000 and obj["criteria"][keys][key][room] >= 1000:
                         obj["criteria"][keys][key][room] = 0.5
                     else:
-                        if obj["criteria"][keys][key][room] > 25 and obj["criteria"][keys][key][room] <= 28:
-                            obj["criteria"][keys][key][room] = 0.3
+                        if obj["criteria"][keys][key][room] < 1000 and obj["criteria"][keys][key][room] >= 400:
+                            obj["criteria"][keys][key][room] = 0.8
                         else:  
-                            if obj["criteria"][keys][key][room] > 28 and obj["criteria"][keys][key][room] <= 30:
-                                obj["criteria"][keys][key][room] = 0.1
-                            else:
-                                obj["criteria"][keys][key][room] = 0
-                        
+                            obj["criteria"][keys][key][room] = 1
+
+
     # Normalizing Air Pressure Data                        
     if key == "Air Pressure":
         if obj["criteria"][keys][key][room] <= 100000:
