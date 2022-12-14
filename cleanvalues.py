@@ -1,5 +1,6 @@
 import os
 import json
+import random
 
 obj = {
 	"criteria": {
@@ -53,6 +54,17 @@ obj = {
 }
 
 
+# Creating and adding modeled data for CO2 and Airpressure
+for room in obj["criteria"]["Health"]["Air Pressure"]:
+    obj["criteria"]["Health"]["Air Pressure"][room] = 101325 + random.randint(-1000, 1500)
+    # print(obj["criteria"]["Health"]["Air Pressure"][room])
+
+for room in obj["criteria"]["Health"]["CO2"]:
+     obj["criteria"]["Health"]["CO2"][room] = 600 + random.randint(-500, 500)
+    #  print(obj["criteria"]["Health"]["CO2"][room])
+
+
+# Normalization
 for keys in obj['criteria']:
   for key in obj["criteria"][keys]:
     for room in obj["criteria"][keys][key]:
@@ -183,10 +195,6 @@ for keys in obj['criteria']:
 
 
         # print(obj["criteria"][keys][key])
-
-    
-
-
 
 
 print(json.dumps(obj, sort_keys=True, indent=4))
