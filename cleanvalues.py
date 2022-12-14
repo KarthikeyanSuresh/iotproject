@@ -84,7 +84,7 @@ for keys in obj['criteria']:
     
 
         # Normalizing Noise Data
-        if key == "Noise":
+        elif key == "Noise":
             if obj["criteria"][keys][key][room] <= 55:
                 obj["criteria"][keys][key][room] = 1
             elif obj["criteria"][keys][key][room] > 55 and obj["criteria"][keys][key][room] <= 70:
@@ -98,7 +98,7 @@ for keys in obj['criteria']:
         
 
         # Normalizing Temperature Data
-        if key == "Humidity":
+        elif key == "Humidity":
             if obj["criteria"][keys][key][room] <= 10:
                 obj["criteria"][keys][key][room] = 0.001
             elif obj["criteria"][keys][key][room] > 10 and obj["criteria"][keys][key][room] <= 20:
@@ -118,7 +118,7 @@ for keys in obj['criteria']:
                             
         
         # Normalizing Humidity Data
-        if key == "Temperature":
+        elif key == "Temperature":
             if obj["criteria"][keys][key][room] <= 15:
                 obj["criteria"][keys][key][room] = 0.001
             elif obj["criteria"][keys][key][room] > 15 and obj["criteria"][keys][key][room] <= 18:
@@ -136,7 +136,7 @@ for keys in obj['criteria']:
 
 
         # Normalizing CO2 Data                        
-        if key == "CO2":
+        elif key == "CO2":
             if obj["criteria"][keys][key][room] >= 10000:
                 obj["criteria"][keys][key][room] = 0.001
             elif obj["criteria"][keys][key][room] < 10000 and obj["criteria"][keys][key][room] >= 4000:
@@ -152,7 +152,7 @@ for keys in obj['criteria']:
 
 
         # Normalizing Air Pressure Data                        
-        if key == "Air Pressure":
+        elif key == "Air Pressure":
             if obj["criteria"][keys][key][room] <= 100000:
                 obj["criteria"][keys][key][room] = 0.001
             elif obj["criteria"][keys][key][room] > 100000 and obj["criteria"][keys][key][room] <= 100300:
