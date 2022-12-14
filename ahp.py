@@ -16,55 +16,55 @@ def get_values(val_dict, obj):
 
 
 # Sample JSON
-obj = {
-	"criteria": {
-		"Comfort" : {
-		     "Luminosity" : {
-                "Room 1" : 1,
-                "Room 2" : 4,
-                "Room 3" : 9
-             },
-		     "Temperature" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
-             },
-		     "Noise" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
-             }
-		},
-		"Health": {
-			"CO2" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
-             },
-		     "Humidity" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
-             },
-		     "Air Pressure" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
-             }
+obj ={
+    "criteria": {
+        "Comfort": {
+            "Luminosity": {
+                "Room 1": 0.5,
+                "Room 2": 0.001,
+                "Room 3": 0.001
+            },
+            "Noise": {
+                "Room 1": 1,
+                "Room 2": 0.8,
+                "Room 3": 0.5
+            },
+            "Temperature": {
+                "Room 1": 0.001,
+                "Room 2": 0.5,
+                "Room 3": 0.1
+            }
         },
-		"Usage":{
-			"Furniture" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
-             },
-		     "Accessibility" : {
-                "Room 1" : 1,
-                "Room 2" : 1,
-                "Room 3" : 1
-             }
-		}
-	}
+        "Health": {
+            "Air Pressure": {
+                "Room 1": 0.5,
+                "Room 2": 0.8,
+                "Room 3": 0.5
+            },
+            "CO2": {
+                "Room 1": 1,
+                "Room 2": 1,
+                "Room 3": 0.8
+            },
+            "Humidity": {
+                "Room 1": 0.2,
+                "Room 2": 0.5,
+                "Room 3": 0.6
+            }
+        },
+        "Usage": {
+            "Accessibility": {
+                "Room 1": 0.7,
+                "Room 2": 1,
+                "Room 3": 0.8
+            },
+            "Furniture": {
+                "Room 1": 1,
+                "Room 2": 0.7,
+                "Room 3": 0.6
+            }
+        }
+    }
 }
 
 room = obj['criteria']['Comfort']['Luminosity'].keys()
