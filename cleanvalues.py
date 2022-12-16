@@ -1,4 +1,3 @@
-import os
 import json
 import random
 
@@ -169,10 +168,9 @@ def cleanValues(obj):
                     else:
                         obj["criteria"][keys][key][room] = 0.001
 
-                # print(obj["criteria"][keys][key])
 
 
 modelValues(obj)
 cleanValues(obj)
 
-print(json.dumps(obj, sort_keys=True, indent=4))
+# print(json.dumps(obj, sort_keys=True, indent=4))
