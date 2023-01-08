@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from flask_mqtt import Mqtt
 import json
 from cleanvalues import createObject
+from ahp import ahp_gen
 
 app = Flask(__name__)
 
@@ -115,6 +116,22 @@ def create_record():
         return render_template('index.html')
     print("get")
     return render_template('index.html')
+
+#Get the latest record in the collection
+@app.route('/getlatest')
+def get_record():
+    _table1 = raw_data.find().sort([('_id', -1)]).limit(1)
+    table1 = [{"criteria": entry["criteria"]} for entry in _table1]
+    return jsonify({"table1": table1})
+
+#Compute for ahp with preference all set to 1
+@app.route('/ahp')
+def get_ahp_result():
+    _table1 = raw_data.find().sort([('_id', -1)]).limit(1)
+    table1 = [{"criteria": entry["criteria"]} for entry in _table1]
+    result = ahp_gen(table1[0])
+    print(result)
+    return jsonify({"table1": table1})
 
 if __name__ == '__main__':
    app.run(host='127.0.0.1', port=5000)
