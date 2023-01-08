@@ -6,8 +6,8 @@ import json
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
-# client = MongoClient('localhost', 27017, username='username', password='password') put authentication
-db = client.flask_db
+# client = MongoClient('localhost', 27017, username='username', password='password') # put authentication
+db = client.local
 raw_data = db.raw_data
 
 # static data for now
@@ -78,7 +78,7 @@ mqtt_client = Mqtt(app)
 
 
 @mqtt_client.on_connect()
-def handle_connect(client, userdata, flags, rc):
+def handle_connect(clients, userdata, flags, rc):
    if rc == 0:
        print('Connected successfully')
        mqtt_client.subscribe(topic) # subscribe topic
@@ -106,11 +106,12 @@ def index():
 
 @app.route('/getfrom_rpi', methods=('GET', 'POST'))
 def create_record():
+    print("test")
     if request.method == 'POST':
         print("post")
         record = json.loads(request.data)
         raw_data.insert_one(record)
-        return redirect(url_for('index')) 
+        return render_template('index.html')
     print("get")
     return render_template('index.html')
 
