@@ -1,8 +1,10 @@
+# This file contains all the necessary helper functions for the functioning of the application
+
 import json
 import random
 
 
-# Static JSON object, to be imported from Arduino
+# Static JSON object is updated with values imported from three different Arduino sensor payloads, one for each room; values unobtainable from the Arduino sensors are initialized with a random value and modeled in a later function
 def createObject(msg1, msg2, msg3):
 
     obj = {
@@ -174,6 +176,7 @@ def cleanValues(obj):
 
 
 
+# createObject(msg1, msg2, msg3)
 # modelValues(obj)
 # cleanValues(obj)
 
