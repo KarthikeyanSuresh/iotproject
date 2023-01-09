@@ -4,64 +4,27 @@ import json
 import random
 
 
-# Static JSON object is updated with values imported from three different Arduino sensor payloads, one for each room; values unobtainable from the Arduino sensors are initialized with a random value and modeled in a later function
-def createObject(msg1, msg2, msg3):
+# Static JSON object is updated with values imported from different Arduino sensor payloads, one for each room 
+# Values unobtainable from the Arduino sensors are initialized with a random value and modeled in a later function
+def addRoomToObject(i, msg, obj):
+    # Convert iterating variable to string ot append it to the JSON object as a room number 
+    i = str(i)
 
-    obj = {
-        "criteria": {
-            "Comfort" : {
-                "Luminosity" : {
-                    "Room 1" : msg1["light"],
-                    "Room 2" : msg2["light"],
-                    "Room 3" : msg3["light"]
-                },
-                "Temperature" : {
-                    "Room 1" : msg1["temperature"],
-                    "Room 2" : msg2["temperature"],
-                    "Room 3" : msg3["temperature"]
-                },
-                "Noise" : {
-                    "Room 1" : msg1["noise"],
-                    "Room 2" : msg2["noise"],
-                    "Room 3" : msg3["noise"]
-                }
-            },
-            "Health": {
-                "CO2" : {
-                    "Room 1" : 400,
-                    "Room 2" : 350,
-                    "Room 3" : 1000
-                },
-                "Humidity" : {
-                    "Room 1" : msg1["humidity"],
-                    "Room 2" : msg2["humidity"],
-                    "Room 3" : msg3["humidity"]
-                },
-                "Air Pressure" : {
-                    "Room 1" : 103000,
-                    "Room 2" : 101325,
-                    "Room 3" : 100000
-                }
-            },
-            "Usage":{
-                "Furniture" : {
-                    "Room 1" : 1,
-                    "Room 2" : 0.7,
-                    "Room 3" : 0.6
-                },
-                "Accessibility" : {
-                    "Room 1" : 0.7,
-                    "Room 2" : 1,
-                    "Room 3" : 0.8
-                }
-            }
-        }
-    }
+    # Appends data to the existing object for a room number specified by the iterating variable
+    obj["criteria"]["Comfort"]["Luminosity"]["Room " + i] = msg["light"]
+    obj["criteria"]["Comfort"]["Temperature"]["Room " + i] = msg["temperature"]
+    obj["criteria"]["Comfort"]["Noise"]["Room " + i] = msg["noise"]
+    obj["criteria"]["Health"]["Humidity"]["Room " + i] = msg["humidity"]
+    obj["criteria"]["Health"]["CO2"]["Room " + i] = 0
+    obj["criteria"]["Health"]["Air Pressure"]["Room " + i] = 0
+    obj["criteria"]["Usage"]["Furniture"]["Room " + i] = 1
+    obj["criteria"]["Usage"]["Accessibility"]["Room " + i] = 1
+
     return obj
 
 
 def modelValues(obj):
-    # Creating and adding modeled data for CO2 and Airpressure
+    # Creating and adding modeled data for CO2, Air Pressure, Furniture and Accessibility
     for room in obj["criteria"]["Health"]["Air Pressure"]:
         obj["criteria"]["Health"]["Air Pressure"][room] = 101325 + random.randint(-1000, 1500)
         # print(obj["criteria"]["Health"]["Air Pressure"][room])
@@ -69,6 +32,13 @@ def modelValues(obj):
     for room in obj["criteria"]["Health"]["CO2"]:
         obj["criteria"]["Health"]["CO2"][room] = 600 + random.randint(-500, 500)
         #  print(obj["criteria"]["Health"]["CO2"][room])
+    
+    for room in obj["criteria"]["Usage"]["Accessibility"]:
+        obj["criteria"]["Usage"]["Accessibility"][room] = 1 + random.randint(-5, 0)*0.1
+    
+    for room in obj["criteria"]["Usage"]["Furniture"]:
+        obj["criteria"]["Usage"]["Furniture"][room] = 1 + random.randint(-5, 0)*0.1        
+
 
 
 def cleanValues(obj):
@@ -175,10 +145,51 @@ def cleanValues(obj):
                         obj["criteria"][keys][key][room] = 0.001
 
 
-def processRawData(msg1, msg2, msg3):
-    obj = createObject(msg1, msg2, msg3)
+# msg is a JSON object array containing the payloads from the rooms (number determined beforehand), it is to be created from the different databases using another function
+def processRawData(msg):
+    # object skeleton with initialized values that will be overwritten and new room data can be appended when iterated in a loop
+    obj = {
+        "criteria": {
+            "Comfort" : {
+                "Luminosity" : {
+                        "Room 1" : 0
+                    },
+                "Temperature" : {
+                        "Room 1" : 0
+                    },
+                "Noise" : {
+                        "Room 1" : 0
+                    }
+            },
+            "Health": {
+                "CO2" : {
+                    "Room 1" : 400
+                    },
+                "Humidity" : {
+                    "Room 1" : 0
+                    },
+                "Air Pressure" : {
+                    "Room 1" : 103000
+                    }
+            },
+            "Usage":{
+                "Furniture" : {
+                    "Room 1" : 1
+                    },
+                "Accessibility" : {
+                    "Room 1" : 0.7
+                    }
+                }
+            }
+        }
+
+    # iterating considering 5 rooms in this case
+    for i in range (1,6):
+        addRoomToObject(i, msg[i], obj)
+
     # print(json.dumps(obj, sort_keys=True, indent=4))
-    modelValues(obj)
-    cleanValues(obj)
+    return obj 
+    
 
-
+# modelValues(obj)
+# cleanValues(obj)
