@@ -211,7 +211,7 @@ def createJSONobjectArray(k):
 # Now the data is usable for ahp.py for AHP calculations 
 
 def startProcess():
-    k = random(0,1440)
+    k = random.randint(0,1440)
     msg = createJSONobjectArray(k)
     obj = processRawData(msg)
     modelValues(obj)
