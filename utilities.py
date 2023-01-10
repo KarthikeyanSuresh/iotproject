@@ -1,131 +1,219 @@
-import ahpy
+# This file contains all the necessary helper functions for the functioning of the application
+
 import json
-import itertools
+import random
 
-def ahp_gen(obj):
 
-   def make_pairs(crit):
-      return list(itertools.combinations(crit, 2))
+# Static JSON object is updated with values imported from different Arduino sensor payloads, one for each room 
+# Values unobtainable from the Arduino sensors are initialized with a random value and modeled in a later function
+def addRoomToObject(i, msg, obj):
+    # Convert iterating variable to string ot append it to the JSON object as a room number 
+    i = str(i)
 
-   def get_values(val_dict, obj):
-      for key1 in obj['criteria']:
-         for key2 in obj["criteria"][key1]:
-            val = []
-            for key3 in obj["criteria"][key1][key2]:
-               val.append(obj["criteria"][key1][key2][key3])
-            val_dict[key2] = val
-      return val_dict
+    # Appends data to the existing object for a room number specified by the iterating variable
+    obj["criteria"]["Comfort"]["Luminosity"]["Room " + i] = msg["light"]
+    obj["criteria"]["Comfort"]["Temperature"]["Room " + i] = msg["temperature"]
+    obj["criteria"]["Comfort"]["Noise"]["Room " + i] = msg["noise"]
+    obj["criteria"]["Health"]["Humidity"]["Room " + i] = msg["humidity"]
+    obj["criteria"]["Health"]["CO2"]["Room " + i] = 0
+    obj["criteria"]["Health"]["Air Pressure"]["Room " + i] = 0
+    obj["criteria"]["Usage"]["Furniture"]["Room " + i] = 1
+    obj["criteria"]["Usage"]["Accessibility"]["Room " + i] = 1
 
-   '''
-   # Sample JSON
-   obj = {
-      "criteria": {
-         "Comfort" : {
-            "Luminosity" : {
-                  "Room 1" : 1,
-                  "Room 2" : 1,
-                  "Room 3" : 1
-               },
-            "Temperature" : {
-                  "Room 1" : 1,
-                  "Room 2" : 1,
-                  "Room 3" : 1
-               },
-            "Noise" : {
-                  "Room 1" : 1,
-                  "Room 2" : 1,
-                  "Room 3" : 1
-               }
-         },
-         "Health": {
-            "CO2" : {
-                  "Room 1" : 1,
-                  "Room 2" : 1,
-                  "Room 3" : 1
-               },
-            "Humidity" : {
-                  "Room 1" : 1,
-                  "Room 2" : 1,
-                  "Room 3" : 1
-               },
-            "Air Pressure" : {
-                  "Room 1" : 1,
-                  "Room 2" : 1,
-                  "Room 3" : 1
-               }
-         },
-         "Usage":{
-            "Furniture" : {
-                  "Room 1" : 1,
-                  "Room 2" : 1,
-                  "Room 3" : 1
-               },
-            "Accessibility" : {
-                  "Room 1" : 1,
-                  "Room 2" : 1,
-                  "Room 3" : 1
-               }
-         }
-      }
-   }
-   '''
-   room = obj['criteria']['Comfort']['Luminosity'].keys()
+    return obj
 
-   criteria_pairs = make_pairs(obj['criteria'].keys())
-   comfort_pairs = make_pairs(obj['criteria']['Comfort'].keys())
-   health_pairs = make_pairs(obj['criteria']['Health'].keys())
-   usage_pairs = make_pairs(obj['criteria']['Usage'].keys())
-   room_pairs = make_pairs(obj['criteria']['Comfort']['Luminosity'].keys())
 
-   val_dict = {}
-   val_dict = get_values(val_dict, obj)
+def modelValues(obj):
+    # Creating and adding modeled data for CO2, Air Pressure, Furniture and Accessibility
+    for room in obj["criteria"]["Health"]["Air Pressure"]:
+        obj["criteria"]["Health"]["Air Pressure"][room] = 101325 + random.randint(-1000, 1500)
+        # print(obj["criteria"]["Health"]["Air Pressure"][room])
 
-   # Normalizing data (maybe Karthik can send data that is ready so normalizing is not needed anymore)
+    for room in obj["criteria"]["Health"]["CO2"]:
+        obj["criteria"]["Health"]["CO2"][room] = 600 + random.randint(-500, 500)
+        #  print(obj["criteria"]["Health"]["CO2"][room])
+    
+    for room in obj["criteria"]["Usage"]["Accessibility"]:
+        obj["criteria"]["Usage"]["Accessibility"][room] = 1 + random.randint(-3, 0)*0.1
+    
+    for room in obj["criteria"]["Usage"]["Furniture"]:
+        obj["criteria"]["Usage"]["Furniture"][room] = 1 + random.randint(-3, 0)*0.1        
 
-   luminosity_data = dict(zip(room, val_dict["Luminosity"]))
-   luminosity_normalized = ahpy.Compare('Luminosity', luminosity_data, precision=3)
-   temperature_data = dict(zip(room, val_dict["Temperature"]))
-   temperature_normalized = ahpy.Compare('Temperature', temperature_data, precision=3)
-   noise_data = dict(zip(room, val_dict["Noise"]))
-   noise_normalized = ahpy.Compare('Noise', noise_data, precision=3)
-   co2_data = dict(zip(room, val_dict["CO2"]))
-   co2_normalized = ahpy.Compare('CO2', co2_data, precision=3)
-   humidity_data = dict(zip(room, val_dict["Humidity"]))
-   humidity_normalized = ahpy.Compare('Humidity', humidity_data, precision=3)
-   airpressure_data = dict(zip(room, val_dict["Air Pressure"]))
-   airpressure_normalized = ahpy.Compare('Air Pressure', airpressure_data, precision=3)
-   furniture_data = dict(zip(room, val_dict["Furniture"]))
-   furniture_normalized = ahpy.Compare('Furniture', furniture_data, precision=3)
-   accessibility_data = dict(zip(room, val_dict["Accessibility"]))
-   accessibility_normalized = ahpy.Compare('Accessibility', accessibility_data, precision=3)
 
-   #Criteria comparisons
-   #For now, everything is 1 (generic) but need to change when advanced is made
-   comfort_comparisons = dict(zip(comfort_pairs, itertools.repeat(1)))
-   health_comparisons = dict(zip(health_pairs, itertools.repeat(1)))
-   usage_comparisons = dict(zip(usage_pairs, itertools.repeat(1)))
 
-   criteria_comparisons = dict(zip(criteria_pairs, itertools.repeat(1)))
+def cleanValues(obj):
+    # Normalization
+    for keys in obj['criteria']:
+        for key in obj["criteria"][keys]:
+            for room in obj["criteria"][keys][key]:
 
-   #Making the tree
-   compose = ahpy.Compose()
+                # Normalizing Luminance Data
+                if key == "Luminosity":
+                    if obj["criteria"][keys][key][room] >= 73:
+                        obj["criteria"][keys][key][room] = 0.001
+                    elif obj["criteria"][keys][key][room] < 73 and obj["criteria"][keys][key][room] >= 43:
+                        obj["criteria"][keys][key] = 1
+                    elif obj["criteria"][keys][key][room] < 43 and obj["criteria"][keys][key][room] >= 23:
+                        obj["criteria"][keys][key][room] = 0.5
+                    else:
+                        obj["criteria"][keys][key][room] = 0.001
+            
 
-   compose.add_comparisons([luminosity_normalized, temperature_normalized, noise_normalized, co2_normalized, humidity_normalized, airpressure_normalized, 
-   furniture_normalized, accessibility_normalized])
+                # Normalizing Noise Data
+                elif key == "Noise":
+                    if obj["criteria"][keys][key][room] <= 55:
+                        obj["criteria"][keys][key][room] = 1
+                    elif obj["criteria"][keys][key][room] > 55 and obj["criteria"][keys][key][room] <= 70:
+                        obj["criteria"][keys][key][room] = 0.8
+                    elif obj["criteria"][keys][key][room] > 70 and obj["criteria"][keys][key][room] <= 80:
+                        obj["criteria"][keys][key][room] = 0.5
+                    elif obj["criteria"][keys][key][room] > 80 and obj["criteria"][keys][key][room] <= 85:
+                        obj["criteria"][keys][key][room] = 0.2
+                    else:
+                        obj["criteria"][keys][key][room] = 0.001
+                
 
-   comparisons = [('Comfort', comfort_comparisons, 3), ('Health', health_comparisons, 3), ('Usage', usage_comparisons, 3), ('Criteria', criteria_comparisons, 3)]
-   compose.add_comparisons(comparisons)
+                # Normalizing Temperature Data
+                elif key == "Humidity":
+                    if obj["criteria"][keys][key][room] <= 10:
+                        obj["criteria"][keys][key][room] = 0.001
+                    elif obj["criteria"][keys][key][room] > 10 and obj["criteria"][keys][key][room] <= 20:
+                        obj["criteria"][keys][key][room] = 0.2
+                    elif obj["criteria"][keys][key][room] > 20 and obj["criteria"][keys][key][room] <= 30:
+                        obj["criteria"][keys][key][room] = 0.5
+                    elif obj["criteria"][keys][key][room] > 30 and obj["criteria"][keys][key][room] <= 40:
+                        obj["criteria"][keys][key][room] = 0.8
+                    elif obj["criteria"][keys][key][room] > 40 and obj["criteria"][keys][key][room] <= 50:
+                        obj["criteria"][keys][key][room] = 1
+                    elif obj["criteria"][keys][key][room] > 50 and obj["criteria"][keys][key][room] <= 60:
+                        obj["criteria"][keys][key][room] = 0.6
+                    elif obj["criteria"][keys][key][room] > 60 and obj["criteria"][keys][key][room] <= 80:
+                        obj["criteria"][keys][key][room] = 0.2
+                    else:
+                        obj["criteria"][keys][key][room] = 0.001
+                                    
+                
+                # Normalizing Humidity Data
+                elif key == "Temperature":
+                    if obj["criteria"][keys][key][room] <= 15:
+                        obj["criteria"][keys][key][room] = 0.001
+                    elif obj["criteria"][keys][key][room] > 15 and obj["criteria"][keys][key][room] <= 18:
+                        obj["criteria"][keys][key][room] = 0.4
+                    elif obj["criteria"][keys][key][room] > 18 and obj["criteria"][keys][key][room] <= 22:
+                        obj["criteria"][keys][key][room] = 1
+                    elif obj["criteria"][keys][key][room] > 22 and obj["criteria"][keys][key][room] <= 25:
+                        obj["criteria"][keys][key][room] = 0.5
+                    elif obj["criteria"][keys][key][room] > 25 and obj["criteria"][keys][key][room] <= 28:
+                        obj["criteria"][keys][key][room] = 0.3
+                    elif obj["criteria"][keys][key][room] > 28 and obj["criteria"][keys][key][room] <= 30:
+                        obj["criteria"][keys][key][room] = 0.1
+                    else:
+                        obj["criteria"][keys][key][room] = 0.001
 
-   #Make heirarchy
-   hierarchy = {'Criteria': ['Comfort', 'Health', 'Usage'],
-   'Comfort': ['Luminosity', 'Temperature', 'Noise'],
-   'Health': ['CO2', 'Humidity', 'Air Pressure'],
-   'Usage': ['Furniture', 'Accessibility']
-   }
 
-   compose.add_hierarchy(hierarchy)
+                # Normalizing CO2 Data                        
+                elif key == "CO2":
+                    if obj["criteria"][keys][key][room] >= 10000:
+                        obj["criteria"][keys][key][room] = 0.001
+                    elif obj["criteria"][keys][key][room] < 10000 and obj["criteria"][keys][key][room] >= 4000:
+                        obj["criteria"][keys][key][room] = 0.2
+                    elif obj["criteria"][keys][key][room] < 4000 and obj["criteria"][keys][key][room] >= 2000:
+                        obj["criteria"][keys][key][room] = 0.4
+                    elif obj["criteria"][keys][key][room] < 2000 and obj["criteria"][keys][key][room] >= 1000:
+                        obj["criteria"][keys][key][room] = 0.5
+                    elif obj["criteria"][keys][key][room] < 1000 and obj["criteria"][keys][key][room] >= 400:
+                        obj["criteria"][keys][key][room] = 0.8
+                    else:  
+                        obj["criteria"][keys][key][room] = 1
 
-   criteria_report = compose.report('Criteria', show=True)
-   result = json.dumps(compose.Criteria.target_weights)
-   return result
 
+                # Normalizing Air Pressure Data                        
+                elif key == "Air Pressure":
+                    if obj["criteria"][keys][key][room] <= 100000:
+                        obj["criteria"][keys][key][room] = 0.001
+                    elif obj["criteria"][keys][key][room] > 100000 and obj["criteria"][keys][key][room] <= 100300:
+                        obj["criteria"][keys][key][room] = 0.3
+                    elif obj["criteria"][keys][key][room] > 100300 and obj["criteria"][keys][key][room] <= 100800:
+                        obj["criteria"][keys][key][room] = 0.5
+                    elif obj["criteria"][keys][key][room] > 100800 and obj["criteria"][keys][key][room] <= 101300:
+                        obj["criteria"][keys][key][room] = 0.8
+                    elif obj["criteria"][keys][key][room] > 101300 and obj["criteria"][keys][key][room] <= 101900:
+                        obj["criteria"][keys][key][room] = 1
+                    elif obj["criteria"][keys][key][room] > 101900 and obj["criteria"][keys][key][room] <= 103000:
+                        obj["criteria"][keys][key][room] = 0.5
+                    else:
+                        obj["criteria"][keys][key][room] = 0.001
+
+
+# msg is a JSON object array containing the payloads from the rooms (number determined beforehand), it is to be created from the different databases using another function
+def processRawData(msg):
+    # object skeleton with initialized values that will be overwritten and new room data can be appended when iterated in a loop
+    obj = {
+        "criteria": {
+            "Comfort" : {
+                "Luminosity" : {
+                        "Room 1" : 0
+                    },
+                "Temperature" : {
+                        "Room 1" : 0
+                    },
+                "Noise" : {
+                        "Room 1" : 0
+                    }
+            },
+            "Health": {
+                "CO2" : {
+                    "Room 1" : 400
+                    },
+                "Humidity" : {
+                    "Room 1" : 0
+                    },
+                "Air Pressure" : {
+                    "Room 1" : 103000
+                    }
+            },
+            "Usage":{
+                "Furniture" : {
+                    "Room 1" : 1
+                    },
+                "Accessibility" : {
+                    "Room 1" : 0.7
+                    }
+                }
+            }
+        }
+
+    # iterating considering 5 rooms in this case
+    for i in range (1,6):
+        addRoomToObject(i, msg[i], obj)
+
+    # print(json.dumps(obj, sort_keys=True, indent=4))
+    return obj 
+    
+
+def createJSONobjectArray(k):
+    msg = []
+    # get payload from each database and add it to the array, using index variable k 
+
+    # Do this for each db
+    # payload = object from db query
+    # msg.append(payload)
+    return msg
+
+
+# Start Process
+# Generate a random value to query the databases with
+# Call createJSONobjectArray() and obtain "msg", the list of the payloads collected from the Arduino values databases for each room
+# Call processRawData(msg), which creates a skeletal object and iterates n times (n set beforehand) and in turn calls addRoomToObject(i, msg, obj)
+# Call modelValues(obj), which models the values for the criteria for which data cannot be obtained from the Arduino
+# Send the modeled JSON object to database to store for admin use
+# Call cleanValues(obj), which normalizes the values of the object based on the optimal value ranges obtained from research
+# Now the data is usable for ahp.py for AHP calculations 
+
+def startProcess():
+    k = random(0,1440)
+    msg = createJSONobjectArray(k)
+    obj = processRawData(msg)
+    modelValues(obj)
+    cleanValues(obj)
+    return obj
